@@ -34,12 +34,9 @@ import androidx.core.view.WindowCompat
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 
 @Composable
-fun JetpackComposeTemplateTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable() () -> Unit
-) {
+fun UndoRedoComposeSampleTheme(content: @Composable() () -> Unit) {
     MaterialTheme(
-        colors = if (darkTheme) DarkColorPalette else LightColorPalette,
+        colors = LightColorPalette,
         shapes = Shapes,
         content = content
     )
@@ -54,26 +51,19 @@ fun EdgeToEdgeContent(content: @Composable () -> Unit) {
     val insetsController = remember(view, window) {
         WindowCompat.getInsetsController(window, view)
     }
-    val isLightTheme = MaterialTheme.colors.isLight
     insetsController?.run {
-        isAppearanceLightNavigationBars = isLightTheme
-        isAppearanceLightStatusBars = isLightTheme
+        isAppearanceLightNavigationBars = false
+        isAppearanceLightStatusBars = false
     }
     ProvideWindowInsets(content = content)
 }
 
-private val DarkColorPalette = darkColors(
-    primary = Color(0xff9bbed3),
-    primaryVariant = Color(0xff9bbed3),
-    secondary = Color(0xff86e6a9),
-    surface = Color(0xff9bbed3).copy(alpha = 0.08f).compositeOver(Color(0xff121212)),
-    background = Color(0xff9bbed3).copy(alpha = 0.08f).compositeOver(Color(0xff121212))
-)
-
 private val LightColorPalette = lightColors(
-    primary = Color(0xff073042),
-    primaryVariant = Color(0xff073042),
-    secondary = Color(0xff3ddc84)
+    primary = Color.White,
+    primaryVariant = Color.White,
+    secondary = Color.White,
+    surface = Color(0xff8476E9),
+    onSurface = Color.White
 )
 
 private val Shapes = Shapes(

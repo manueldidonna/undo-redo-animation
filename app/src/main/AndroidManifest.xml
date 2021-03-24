@@ -3,18 +3,18 @@
     package="com.manueldidonna.jetpackcomposetemplate">
 
     <application
-        android:name=".JetpackComposeTemplateApplication"
+        android:name=".UndoRedoComposeSampleApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.JetpackComposeTemplate">
+        android:theme="@style/Theme.UndoRedoComposeSample">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.JetpackComposeTemplate"
+            android:theme="@style/Theme.UndoRedoComposeSample"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

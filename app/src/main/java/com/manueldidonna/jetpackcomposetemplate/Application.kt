@@ -2,4 +2,4 @@ package com.manueldidonna.jetpackcomposetemplate
 
 import android.app.Application
 
-class JetpackComposeTemplateApplication : Application()
+class UndoRedoComposeSampleApplication : Application()

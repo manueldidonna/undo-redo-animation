@@ -19,9 +19,10 @@ package com.manueldidonna.jetpackcomposetemplate
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 
 class MainActivity : ComponentActivity() {
@@ -29,9 +30,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            JetpackComposeTemplateTheme {
+            UndoRedoComposeSampleTheme {
                 EdgeToEdgeContent {
-                    JetpackComposeTemplate()
+                    UndoRedoComposeSample()
                 }
             }
         }
@@ -39,8 +40,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun JetpackComposeTemplate() {
-    Surface {
-        Text(text = "Hello world!")
+fun UndoRedoComposeSample() {
+    Surface(modifier = Modifier.fillMaxSize()) {
+        UndoRedoAnimation()
     }
 }
