@@ -214,27 +214,27 @@ private fun Clock(modifier: Modifier, progress: Float) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(12.dp)
         ) {
             val radius = size.width / 2
-            val angle1 = PI * (60 * progress) / 30 - PI / 2
+            val bigHandAngle = PI * (60 * progress) / 30 - PI / 2
             drawLine(
                 color = handColor,
                 start = center,
                 end = center + Offset(
-                    x = (cos(angle1) * radius).toFloat(),
-                    y = (sin(angle1) * radius).toFloat()
+                    x = (cos(bigHandAngle) * radius).toFloat(),
+                    y = (sin(bigHandAngle) * radius).toFloat()
                 ),
                 strokeWidth = 4.dp.toPx(),
                 cap = StrokeCap.Round
             )
-            val angle2 = PI * (0.4 + 0.4 * progress) - PI / 2
+            val smallHandAngle = PI * (0.4 + 0.4 * progress) - PI / 2
             drawLine(
                 color = handColor,
                 start = center,
                 end = center + Offset(
-                    x = (cos(angle2) * radius * 0.6).toFloat(),
-                    y = (sin(angle2) * radius * 0.6).toFloat()
+                    x = (cos(smallHandAngle) * radius * 0.6).toFloat(),
+                    y = (sin(smallHandAngle) * radius * 0.6).toFloat()
                 ),
                 strokeWidth = 4.dp.toPx(),
                 cap = StrokeCap.Round
