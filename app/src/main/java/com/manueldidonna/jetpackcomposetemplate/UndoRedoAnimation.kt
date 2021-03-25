@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -45,8 +46,8 @@ fun UndoRedoAnimation() {
 
     val scope = rememberCoroutineScope()
 
-    val undoIconRipple = remember { Ripple() }
-    val redoIconRipple = remember { Ripple() }
+    val undoIconRipple = remember { RippleAnimation() }
+    val redoIconRipple = remember { RippleAnimation() }
 
     var isUndoEnabled by remember { mutableStateOf(true) }
     var isRedoEnabled by remember { mutableStateOf(true) }
@@ -93,8 +94,8 @@ fun UndoRedoAnimation() {
                 }
             )
     ) {
-        UndoIcon(ripple = undoIconRipple, enabled = isUndoEnabled)
-        RedoIcon(ripple = redoIconRipple, enabled = isRedoEnabled)
+        UndoIcon(rippleAnimation = undoIconRipple, enabled = isUndoEnabled)
+        RedoIcon(rippleAnimation = redoIconRipple, enabled = isRedoEnabled)
 
         Clock(
             modifier = Modifier
@@ -107,62 +108,67 @@ fun UndoRedoAnimation() {
 }
 
 @Composable
-private fun BoxScope.UndoIcon(ripple: Ripple, enabled: Boolean) {
-    val iconAlpha by animateAlphaAsState(enabled)
-    Icon(
-        imageVector = Icons.Rounded.Undo,
+private fun BoxScope.UndoIcon(rippleAnimation: RippleAnimation, enabled: Boolean) {
+    UndoRedoIcon(
+        modifier = Modifier.align(Alignment.CenterStart),
+        enabled = enabled,
         contentDescription = "undo icon",
-        modifier = Modifier
-            .align(Alignment.CenterStart)
-            .padding(horizontal = 16.dp)
-            .graphicsLayer {
-                clip = true
-                alpha = iconAlpha
-            }
+        imageVector = Icons.Rounded.Undo
     )
-
-    val rippleColor = MaterialTheme.colors.onSurface
-    Canvas(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(fraction = 0.5f)
-            .align(Alignment.CenterStart)
-    ) {
-        drawCircle(
-            center = Offset(0f, size.height / 2f),
-            color = rippleColor.copy(alpha = ripple.alpha),
-            radius = ripple.radiusPercent * size.width
-        )
-    }
+    Ripple(
+        modifier = Modifier.align(Alignment.CenterStart),
+        animation = rippleAnimation,
+        animateFromStart = true
+    )
 }
 
 @Composable
-private fun BoxScope.RedoIcon(ripple: Ripple, enabled: Boolean) {
+private fun BoxScope.RedoIcon(rippleAnimation: RippleAnimation, enabled: Boolean) {
+    UndoRedoIcon(
+        modifier = Modifier.align(Alignment.CenterEnd),
+        enabled = enabled,
+        contentDescription = "redo icon",
+        imageVector = Icons.Rounded.Redo
+    )
+    Ripple(
+        modifier = Modifier.align(Alignment.CenterEnd),
+        animation = rippleAnimation,
+        animateFromStart = false
+    )
+}
+
+@Composable
+private fun UndoRedoIcon(
+    modifier: Modifier,
+    imageVector: ImageVector,
+    enabled: Boolean,
+    contentDescription: String
+) {
     val iconAlpha by animateAlphaAsState(enabled)
     Icon(
-        imageVector = Icons.Rounded.Redo,
-        contentDescription = "redo icon",
-        modifier = Modifier
-            .align(Alignment.CenterEnd)
+        imageVector = imageVector,
+        contentDescription = contentDescription,
+        modifier = modifier
             .padding(horizontal = 16.dp)
             .graphicsLayer {
                 clip = true
                 alpha = iconAlpha
             }
     )
+}
 
+@Composable
+private fun Ripple(modifier: Modifier, animation: RippleAnimation, animateFromStart: Boolean) {
     val rippleColor = MaterialTheme.colors.onSurface
-
     Canvas(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth(fraction = 0.5f)
-            .align(Alignment.CenterEnd)
     ) {
         drawCircle(
-            center = Offset(size.width, size.height / 2f),
-            color = rippleColor.copy(alpha = ripple.alpha),
-            radius = ripple.radiusPercent * size.width
+            center = Offset(if (animateFromStart) 0f else size.width, size.height / 2f),
+            color = rippleColor.copy(alpha = animation.alpha),
+            radius = animation.radiusPercent * size.width
         )
     }
 }
@@ -176,7 +182,7 @@ private fun animateAlphaAsState(enabled: Boolean): State<Float> {
 }
 
 @Stable
-private class Ripple {
+private class RippleAnimation {
     private val animatedAlpha = Animatable(0f)
     private val animatedRadiusPercent = Animatable(0f)
 
