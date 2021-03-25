@@ -35,70 +35,72 @@ import kotlin.math.sin
 
 @Composable
 fun UndoRedoAnimation() {
+    val containerWidth = 180.dp
+
+    val density = LocalDensity.current
+    val dragMaxDistancePx = remember { with(density) { containerWidth.toPx() - 56.dp.toPx() } }
+    val offsetPosition = remember { Animatable(initialValue = dragMaxDistancePx / 2) }
+    val undoIconPosition = remember { with(density) { 16.dp.toPx() + 12.dp.toPx() } }
+    val redoIconPosition = remember { with(density) { dragMaxDistancePx - 12.dp.toPx() } }
+
+    val scope = rememberCoroutineScope()
+
+    val undoIconRipple = remember { Ripple() }
+    val redoIconRipple = remember { Ripple() }
+
+    var isUndoEnabled by remember { mutableStateOf(true) }
+    var isRedoEnabled by remember { mutableStateOf(true) }
+
     Box(
         modifier = Modifier
-            .requiredSize(height = 56.dp, width = 200.dp)
+            .requiredSize(height = 56.dp, width = containerWidth)
             .background(
                 color = MaterialTheme.colors.onSurface.copy(alpha = 0.28f),
                 shape = CircleShape
             )
             .clip(CircleShape)
+            .draggable(
+                state = rememberDraggableState { deltaPx ->
+                    val newValue = offsetPosition.value + deltaPx
+                    scope.launch {
+                        offsetPosition.snapTo(newValue.coerceIn(0f, dragMaxDistancePx))
+                    }
+                },
+                orientation = Orientation.Horizontal,
+                startDragImmediately = true,
+                onDragStopped = {
+                    val currentDragPosition = offsetPosition.value
+
+                    if (currentDragPosition < undoIconPosition && isUndoEnabled) {
+                        isRedoEnabled = true
+                        isUndoEnabled = false
+                        launch { undoIconRipple.animate() }
+                    } else if (currentDragPosition > redoIconPosition && isRedoEnabled) {
+                        isRedoEnabled = false
+                        isUndoEnabled = true
+                        launch { redoIconRipple.animate() }
+                    }
+
+                    launch {
+                        offsetPosition.animateTo(
+                            targetValue = dragMaxDistancePx / 2,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                    }
+                }
+            )
     ) {
-        val scope = rememberCoroutineScope()
-
-        val undoIconRipple = remember { Ripple() }
-        val redoIconRipple = remember { Ripple() }
-
-        var isUndoEnabled by remember { mutableStateOf(true) }
-        var isRedoEnabled by remember { mutableStateOf(true) }
-
         UndoIcon(ripple = undoIconRipple, enabled = isUndoEnabled)
         RedoIcon(ripple = redoIconRipple, enabled = isRedoEnabled)
-
-        val density = LocalDensity.current
-        val dragMaxDistancePx = remember { with(density) { 200.dp.toPx() - 56.dp.toPx() } }
-        val offsetPosition = remember { Animatable(initialValue = dragMaxDistancePx / 2) }
-        val undoIconPosition = remember { with(density) { 16.dp.toPx() + 12.dp.toPx() } }
-        val redoIconPosition = remember { with(density) { dragMaxDistancePx - 12.dp.toPx() } }
 
         Clock(
             modifier = Modifier
                 .zIndex(8f)
                 .size(56.dp)
-                .offset { IntOffset(x = offsetPosition.value.roundToInt(), 0) }
-                .draggable(
-                    state = rememberDraggableState { deltaPx ->
-                        val newValue = offsetPosition.value + deltaPx
-                        scope.launch {
-                            offsetPosition.snapTo(newValue.coerceIn(0f, dragMaxDistancePx))
-                        }
-                    },
-                    orientation = Orientation.Horizontal,
-                    startDragImmediately = true,
-                    onDragStopped = {
-                        val currentDragPosition = offsetPosition.value
-
-                        if (currentDragPosition < undoIconPosition && isUndoEnabled) {
-                            isRedoEnabled = true
-                            isUndoEnabled = false
-                            launch { undoIconRipple.animate() }
-                        } else if (currentDragPosition > redoIconPosition && isRedoEnabled) {
-                            isRedoEnabled = false
-                            isUndoEnabled = true
-                            launch { redoIconRipple.animate() }
-                        }
-
-                        launch {
-                            offsetPosition.animateTo(
-                                targetValue = dragMaxDistancePx / 2,
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                )
-                            )
-                        }
-                    }
-                ),
+                .offset { IntOffset(x = offsetPosition.value.roundToInt(), 0) },
             progress = offsetPosition.value / (dragMaxDistancePx / 2)
         )
     }
@@ -200,7 +202,7 @@ private fun Clock(modifier: Modifier, progress: Float) {
     val handColor = MaterialTheme.colors.surface
     Box(
         modifier = modifier
-            .shadow(elevation = 4.dp, shape = CircleShape, clip = true)
+            .shadow(elevation = 1.dp, shape = CircleShape, clip = true)
             .background(color = MaterialTheme.colors.onSurface, shape = CircleShape)
     ) {
         Canvas(
