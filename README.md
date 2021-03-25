@@ -3,4 +3,4 @@ A beautiful Undo Redo animation built with [Jetpack Compose](https://developer.a
 
 Inspired by Oleg Frolov's shot on [Dribble](https://dribbble.com/shots/15334767-Undo-Redo-Button)
 
-<img width="24%" src="art/animation.gif?raw=true">
+<img width="50%" src="art/animation.gif?raw=true">
